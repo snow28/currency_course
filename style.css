@@ -1,0 +1,174 @@
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,
+form,fieldset,input,textarea,p,blockquote,th,td {
+    padding: 0;
+    margin: 0;
+}
+ol,ul {
+    list-style: none;
+}
+html{
+	height : 100%;
+}
+
+body{
+	min-height : 97%;
+}
+
+input[type=text], select {
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+input[type=submit] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type=submit]:hover {
+    background-color: #45a049;
+}
+
+header{
+	font-family: 'Fresca', sans-serif;
+	display : flex;
+	border-bottom : 3px solid darkred;
+}
+
+header h1{
+	font-size : 49px;
+	color : darkred;
+	display : flex;
+	justify-content : center;
+}
+
+
+
+nav{
+	font-family: 'Crete Round', serif;
+	padding-top : 1%;
+	font-size : 1em;
+	text-align : center;
+	display : flex;
+	
+}
+
+nav label{
+	font-size : 2em;
+}
+
+nav input{
+	border-radius : 4px;
+	text-align : center;
+	font-size : 1.2em;
+	line-height : 1.2em;
+}
+
+#checkboxes{
+	color : blue;
+	display : block;
+	font-size : 10px;
+}
+
+#checkboxes label{
+	padding-left : 10px;
+}
+
+#padding_left_1em{
+	padding-left : 1em;
+}
+
+.button{
+	display : block;
+}
+
+.button input{
+	padding : 0 10px;
+	font-size : 30px;
+}		
+
+#rates{
+	font-family: 'Fresca', sans-serif;
+	margin-bottom : 60px;	
+}
+
+#rates table{
+	text-align : center;
+	border-spacing: 0;
+	empty-cells: hide;
+}
+
+td{
+	padding: 10px 20px;
+	text-align: center;
+	border-bottom: 1px solid #F4EEE8;
+	transition: all 0.5s linear;
+}
+
+
+#rates td:first-child {
+	color: #3D3511;
+	font-weight: bold;
+}
+#rates th{
+	padding: 10px 20px;
+	color: #3D3511;
+	border-bottom: 1px solid #F4EEE8;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+	font-size : 27px;
+	text-align : center;
+}
+
+#rates td:nth-child(even) {
+	background: #F6D27E;
+}
+
+#rates td:nth-child(odd) {
+	background: #D1C7BF;
+}
+
+#rates th:nth-child(even)  {
+	background: #F6D27E;
+}
+#rates th:nth-child(odd)  {
+	background: #D1C7BF;
+}
+.round-top {
+	border-top-left-radius: 5px;
+}
+.round-bottom {
+	border-bottom-left-radius: 5px;
+}
+#rates tr:hover td{
+	background: #D1C7BF;
+	font-weight: bold;
+}
+
+
+footer{
+	min-width : 100%;
+	font-family: 'Fresca', sans-serif;
+	font-size : 18px;
+	text-align: center;
+	position: fixed; /* Фиксированное положение */
+	line-height : 1.4em;
+    left: 0; 
+    bottom: 0;  
+    margin : 0;
+    height : 3%;
+	border-top : 2px solid black;
+	background : black;
+	color : white;
+}
+
+
+
