@@ -38,11 +38,11 @@ session_start();
 
 			<form method="get" action="index.php" >
 				<div id='checkboxes'>
-					<label for="currency">USD-EUR</label>
+					<label for="formDoor">USD-EUR</label>
 					<input type="radio" checked name="formDoor[]" value="USD-EUR" /> 
-					<label for="currency">UAH-USD</label> 
+					<label for="formDoor">UAH-USD</label> 
 					<input type="radio" name="formDoor[]" value="USD-UAH" />
-					<label for="currency">UAH-EUR</label> 
+					<label for="formDoor">UAH-EUR</label> 
 					<input type="radio"  name="formDoor[]" value="EUR-UAH" />
 				</div>
 				
@@ -92,7 +92,7 @@ session_start();
 					return $stringToReturn;
 				}
 
-				function display_content(){
+				function display_content($coursesArray, $datesArray , $coursesArrayEUR){
 					$trigger=false;
 					for($currentPosition = 0; $currentPosition < sizeof($coursesArray) ; $currentPosition++){
 						if($datesArray[$currentPosition] == $_GET['date_2']){
@@ -128,12 +128,6 @@ session_start();
 					for($var=0 ; $var < strlen($contentEUR) ; $var++){
 						//checking if we are at appropriate position 
 						if(checkIfEUR($contentEUR, $var) ){
-							//tmp1 and tmp2 variables will be used to store date and course of current date
-							if($contentEUR[$var+98-1] == '1'){
-								$tmp1 .='1';
-							}else if($contentEUR[$var+98-1] == '2'){
-								$tmp1 .='2';
-							}
 							for($x=0; $x<11;$x++){
 								if($contentEUR[$var+98+$x] == '/' && $x >= 10){
 									break;
@@ -182,6 +176,8 @@ session_start();
 								$tmp1 .='1';
 							}else if($contentUSD[$var+98-1] == '2'){
 								$tmp1 .='2';
+							}else if($contentUSD[$var+98-1] == '3'){
+								$tmp1 .='3';
 							}
 							for($x=0; $x<11;$x++){
 								if($contentUSD[$var+98+$x] == '/' && $x >= 10){
@@ -225,50 +221,18 @@ session_start();
 					echo "<table class='col-xs-offset-3 col-xs-6'>";
 					echo "<caption style='text-align : center;'>EUR-USD currency course table</caption>";
 					echo "<tr><th>Date</th><th>1 USD-EUR</th><th>1 EUR-USD</th></tr>";
-					//var_dump((int)$date_2,(int)$month_2,(int)$year_2);
 
 					if((int)$year_1 < (int)$year_2 ){
-						$trigger=false;
-						for($currentPosition = 0; $currentPosition < sizeof($coursesArray) ; $currentPosition++){
-							if($datesArray[$currentPosition] == $_GET['date_2']){
-								$trigger = true;
-							}else if($datesArray[$currentPosition] == $_GET['date_1']){
-								$trigger = false;
-							}
-							if($trigger == true){
-								echo '<tr>';
-								echo "<td style='font-size : 20px;' >" . $datesArray[$currentPosition] . "</td><td style='font-size : 20px;'>" . $coursesArray[$currentPosition] . "</td><td style='font-size:20px;' >" . $coursesArrayEUR[$currentPosition] . '</td>';
-								echo '</tr>';
-							}
-						}
+						
+						display_content($coursesArray, $datesArray , $coursesArrayEUR);
+
 					}else if((int)$year_1 == (int)$year_2 && (int)$month_1 < (int)$month_2){
-						$trigger=false;
-						for($currentPosition = 0; $currentPosition < sizeof($coursesArray) ; $currentPosition++){
-							if($datesArray[$currentPosition] == $_GET['date_2']){
-								$trigger = true;
-							}else if($datesArray[$currentPosition] == $_GET['date_1']){
-								$trigger = false;
-							}
-							if($trigger == true){
-								echo '<tr>';
-								echo "<td style='font-size : 20px;' >" . $datesArray[$currentPosition] . "</td><td style='font-size : 20px;'>" . $coursesArray[$currentPosition] . "</td><td style='font-size:20px;' >" . $coursesArrayEUR[$currentPosition] . '</td>';
-								echo '</tr>';
-							}
-						}
+
+						display_content($coursesArray, $datesArray , $coursesArrayEUR);
+
 					}else if((int)$year_1 == (int)$year_2 && (int)$month_1 == (int)$month_2 && (int)$date_1 < (int)$date_2 ){
-						$trigger=false;
-						for($currentPosition = 0; $currentPosition < sizeof($coursesArray) ; $currentPosition++){
-							if($datesArray[$currentPosition] == $_GET['date_2']){
-								$trigger = true;
-							}else if($datesArray[$currentPosition] == $_GET['date_1']){
-								$trigger = false;
-							}
-							if($trigger == true){
-								echo '<tr>';
-								echo "<td style='font-size : 20px;' >" . $datesArray[$currentPosition] . "</td><td style='font-size : 20px;'>" . $coursesArray[$currentPosition] . "</td><td style='font-size:20px;' >" . $coursesArrayEUR[$currentPosition] . '</td>';
-								echo '</tr>';
-							}
-						}
+
+						display_content($coursesArray, $datesArray , $coursesArrayEUR);
 
 					}else{
 						echo "<div id='error'><p>First date should be less than second!</p></div>";
