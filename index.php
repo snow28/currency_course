@@ -41,10 +41,7 @@ session_start();
 					<label for="formDoor">USD-EUR</label>
 					<input type="radio" checked name="formDoor[]" value="USD-EUR" /> 
 					<label for="currency">UAH-USD</label> 
-					<input type="radio" name="formDoor[]" value="USD-UAH" />
-					<label for="currency">UAH-EUR</label> 
-					<input type="radio"  name="formDoor[]" value="EUR-UAH" />
-					
+					<input id='secondCheckbox' type="radio" name="formDoor[]" value="USD-UAH" />					
 				</div>
 				
 				<div>
@@ -102,38 +99,55 @@ session_start();
 					}							
 				}
 
-					//				1 EUR -> USD
-					$contentEUR=file_get_contents('http://www.exchangerates.org.uk/EUR-USD-exchange-rate-history-full.html');
+					//change setting depends on checkboxes
+					if($_GET['formDoor'][0] == 'USD-EUR'){
+						$lettersSecond=array('U','R','U' );
+						$lettersFirst=array('S','D','E');
+						$linkTwo='EUR-USD';
+						$linkOne='USD-EUR';
+						$th1='1 USD-EUR';
+						$th2='1 EUR-USD';
+					}else if($_GET['formDoor'][0] == 'USD-UAH'){
+						$lettersSecond=array('S','D','U' );
+						$lettersFirst=array('A','H','U');
+						$linkOne='UAH-USD';
+						$linkTwo='USD-UAH';
+						$th1='1 UAH-USD';
+						$th2='1 USD-UAH';
+						echo "<script>$('#secondCheckbox').attr('checked', 'checked');</script>";
+					}
+
+					$firstContent=file_get_contents('http://www.exchangerates.org.uk/' . $linkTwo . '-exchange-rate-history-full.html');
 					#начало забираемого контента: 
-					$pos=strpos($contentEUR,'<table'); 
+					$pos=strpos($firstContent,'<table'); 
 					#Отрезаем все, что идет до нужной нам позиции: 
-					$contentEUR=substr($contentEUR,$pos); 
+					$firstContent=substr($firstContent,$pos); 
 					#Таким же образом находим позицию конечной строки: 
-					$pos=strpos($contentEUR, '</table>'); 
+					$pos=strpos($firstContent, '</table>'); 
 					#Отрезаем ненужное: 
-					$contentEUR=substr($contentEUR,0,$pos); 
-					$contentEUR=substr($contentEUR,295);
-					$sizeOfContent = sizeof($contentEUR);
-					$contentEUR = substr($contentEUR,28);
+					$firstContent=substr($firstContent,0,$pos); 
+					$firstContent=substr($firstContent,295);
+					$sizeOfContent = sizeof($firstContent);
+					$firstContent = substr($firstContent,28);
 					$coursesArrayEUR = array();
 					$datesArrayEUR = array();
 
 
-					for($var=0 ; $var < strlen($contentEUR) ; $var++){
+					for($var=0 ; $var < strlen($firstContent) ; $var++){
 						//checking if we are at appropriate position 
-						if( check_position($contentEUR , $var , 'U' , 'R' , 'U') ){
+						if( check_position($firstContent , $var , $lettersSecond[0] , $lettersSecond[1] , $lettersSecond[2]) ){
 							for($x=0; $x<11;$x++){
-								if($contentEUR[$var+98+$x] == '/' && $x >= 10){
+								if($firstContent[$var+98+$x] == '/' && $x >= 10){
 									break;
 								}
-								if($contentEUR[$var+98+$x] != '<'  ){
-									$tmp1 .= $contentEUR[$var+98+$x];
+								if($firstContent[$var+98+$x] != '<'  ){
+									$tmp1 .= $firstContent[$var+98+$x];
 								}
 							}
 							for($z=0; $z<6;$z++){
 								//do not display spaces
-								if($contentUSD[$var+5+$z] != ' '){
-									$tmp2 .= $contentEUR[$var+5+$z];
+								if($secondContent[$var+5+$z] != ' '){
+									$tmp2 .= $firstContent[$var+5+$z];
 								}
 							}
 							$numberOfCourses++;
@@ -144,47 +158,49 @@ session_start();
 						unset($tmp2);
 					}
 
-										//				1 USD -> EUR
-					$contentUSD=file_get_contents('http://www.exchangerates.org.uk/USD-EUR-exchange-rate-history-full.html');
+
+
+
+					$secondContent=file_get_contents('http://www.exchangerates.org.uk/' . $linkOne . '-exchange-rate-history-full.html');
 					#начало забираемого контента: 
-					$pos=strpos($contentUSD,'<table'); 
+					$pos=strpos($secondContent,'<table'); 
 					#Отрезаем все, что идет до нужной нам позиции: 
-					$contentUSD=substr($contentUSD,$pos); 
+					$secondContent=substr($secondContent,$pos); 
 					#Таким же образом находим позицию конечной строки: 
-					$pos=strpos($contentUSD, '</table>'); 
+					$pos=strpos($secondContent, '</table>'); 
 					#Отрезаем ненужное: 
-					$contentUSD=substr($contentUSD,0,$pos); 
-					$contentUSD=substr($contentUSD,295);
-					$sizeOfContent = sizeof($contentUSD);
-					$contentUSD = substr($contentUSD,28);
+					$secondContent=substr($secondContent,0,$pos); 
+					$secondContent=substr($secondContent,295);
+					$sizeOfContent = sizeof($secondContent);
+					$secondContent = substr($secondContent,28);
 					$coursesArray = array();
 					$datesArray = array();
 					//count current number of courses available
 					$numberOfCourses = 0;
 
-					for($var=0 ; $var < strlen($contentUSD) ; $var++){
+					for($var=0 ; $var < strlen($secondContent) ; $var++){
 						//checking if we are at appropriate position 
-						if(check_position($contentUSD , $var , 'S' , 'D' , 'E') ){
+						if(check_position($secondContent , $var , $lettersFirst[0] , $lettersFirst[1] , $lettersFirst[2]) ){
 							//tmp1 and tmp2 variables will be used to store date and course of current date
-							if($contentUSD[$var+98-1] == '1'){
+							if($secondContent[$var+98-1] == '1'){
 								$tmp1 .='1';
-							}else if($contentUSD[$var+98-1] == '2'){
+							}else if($secondContent[$var+98-1] == '2'){
 								$tmp1 .='2';
-							}else if($contentUSD[$var+98-1] == '3'){
+							}else if($secondContent[$var+98-1] == '3'){
 								$tmp1 .='3';
 							}
 							for($x=0; $x<11;$x++){
-								if($contentUSD[$var+98+$x] == '/' && $x >= 10){
+								if($secondContent[$var+98+$x] == '/' && $x >= 10){
 									break;
 								}
-								if($contentUSD[$var+98+$x] != '<'  ){
-									$tmp1 .= $contentUSD[$var+98+$x];
+								if($secondContent[$var+98+$x] != '<'  ){
+									$tmp1 .= $secondContent[$var+98+$x];
 								}
 							}
 							for($z=0; $z<6;$z++){
 								//do not display spaces
-								if($contentUSD[$var+5+$z] != ' '){
-									$tmp2 .= $contentUSD[$var+5+$z];
+								if($secondContent[$var+5+$z] != ' '){
+									$tmp2 .= $secondContent[$var+5+$z];
 								}
 							}
 							$numberOfCourses++;
@@ -213,8 +229,8 @@ session_start();
 						$year_2 .= $_GET['date_2'][$x+6];
 					}
 					echo "<table class='col-xs-offset-3 col-xs-6'>";
-					echo "<caption style='text-align : center;'>EUR-USD currency course table</caption>";
-					echo "<tr><th>Date</th><th>1 USD-EUR</th><th>1 EUR-USD</th></tr>";
+					echo "<caption style='text-align : center;'>" . $_GET['formDoor'][0] . " currency course table</caption>";
+					echo "<tr><th>Date</th><th>" . $th1 . "</th><th>" . $th2 . "</th></tr>";
 					//var_dump((int)$date_2,(int)$month_2,(int)$year_2);
 
 					if((int)$year_1 < (int)$year_2 ){

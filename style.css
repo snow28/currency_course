@@ -40,12 +40,11 @@ input[type=submit]:hover {
 header{
 	font-family: 'Fresca', sans-serif;
 	display : flex;
-	border-bottom : 3px solid darkred;
+	border-bottom : 3px solid black;
 }
 
 header h1{
 	font-size : 49px;
-	color : darkred;
 	display : flex;
 	justify-content : center;
 }
@@ -73,7 +72,7 @@ nav input{
 }
 
 #checkboxes{
-	color : blue;
+	color : black;
 	display : block;
 	font-size : 10px;
 }
