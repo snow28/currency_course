@@ -40,10 +40,11 @@ session_start();
 				<div id='checkboxes'>
 					<label for="formDoor">USD-EUR</label>
 					<input type="radio" checked name="formDoor[]" value="USD-EUR" /> 
-					<label for="formDoor">UAH-USD</label> 
+					<label for="currency">UAH-USD</label> 
 					<input type="radio" name="formDoor[]" value="USD-UAH" />
-					<label for="formDoor">UAH-EUR</label> 
+					<label for="currency">UAH-EUR</label> 
 					<input type="radio"  name="formDoor[]" value="EUR-UAH" />
+					
 				</div>
 				
 				<div>
@@ -65,19 +66,12 @@ session_start();
 
 		<section id="rates" class="col-xs-offset-2 col-xs-8"  >
 		<?php
-				function checkIfUSD($array, $position){
-						if($array[$position] == 'S' && $array[$position+1] == 'D' && $array[$position+3] != 'E'){
-							return true;
-						}else{
-							return false;
-						}	
-				}
-				function checkIfEUR($array, $position){
-						if($array[$position] == 'U' && $array[$position+1] == 'R' && $array[$position+3] != 'U'){
-							return true;
-						}else{
-							return false;
-						}	
+				function check_position($array, $position , $pre_last_letter, $last_letter , $first_of_next_currency){
+					if($array[$position] == $pre_last_letter && $array[$position+1] == $last_letter && $array[$position+3] != $first_of_next_currency){
+						return true;
+					}else{
+						return false;
+					}	
 				}
 				function changeTypeOfDate( $date ){
 					$stringToReturn .= $date[3];
@@ -127,7 +121,7 @@ session_start();
 
 					for($var=0 ; $var < strlen($contentEUR) ; $var++){
 						//checking if we are at appropriate position 
-						if(checkIfEUR($contentEUR, $var) ){
+						if( check_position($contentEUR , $var , 'U' , 'R' , 'U') ){
 							for($x=0; $x<11;$x++){
 								if($contentEUR[$var+98+$x] == '/' && $x >= 10){
 									break;
@@ -170,7 +164,7 @@ session_start();
 
 					for($var=0 ; $var < strlen($contentUSD) ; $var++){
 						//checking if we are at appropriate position 
-						if(checkIfUSD($contentUSD, $var) ){
+						if(check_position($contentUSD , $var , 'S' , 'D' , 'E') ){
 							//tmp1 and tmp2 variables will be used to store date and course of current date
 							if($contentUSD[$var+98-1] == '1'){
 								$tmp1 .='1';
@@ -221,6 +215,7 @@ session_start();
 					echo "<table class='col-xs-offset-3 col-xs-6'>";
 					echo "<caption style='text-align : center;'>EUR-USD currency course table</caption>";
 					echo "<tr><th>Date</th><th>1 USD-EUR</th><th>1 EUR-USD</th></tr>";
+					//var_dump((int)$date_2,(int)$month_2,(int)$year_2);
 
 					if((int)$year_1 < (int)$year_2 ){
 						
