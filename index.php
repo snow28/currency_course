@@ -40,17 +40,22 @@ session_start();
 				<div id='checkboxes'>
 					<label for="currency">USD-EUR</label>
 					<input type="radio" checked name="formDoor[]" value="USD-EUR" /> 
-					<label for="currency">EUR-USD</label>
-					<input type="radio" name="formDoor[]" value="EUR-USD" />
 					<label for="currency">UAH-USD</label> 
-					<input type="radio" name="formDoor[]" value="UAH-USD" />
+					<input type="radio" name="formDoor[]" value="USD-UAH" />
 					<label for="currency">UAH-EUR</label> 
-					<input type="radio"  name="formDoor[]" value="UAH-EUR" />
+					<input type="radio"  name="formDoor[]" value="EUR-UAH" />
 				</div>
-				<label for="date_1">From:</label> 
-				<input type="text" id="datepicker1"  name="date_1" size="30">
-				<label for="date_2" id='padding_left_1em' >To:</label>
-				<input type="text" id="datepicker2" name="date_2" size="30">
+				
+				<div>
+					<div id='display_inline'>
+						<label for="date_1">From:</label> 
+						<input type="text" id="datepicker1"  name="date_1" size="30">
+					</div>
+					<div id='display_inline'>
+						<label for="date_2" id='padding_left_1em' >To:</label>
+						<input type="text" id="datepicker2" name="date_2" size="30">
+					</div>
+				</div>
 				<div class='button'>
 					<input type="submit" value="Submit" class='w3-btn w3-white w3-border w3-border-red w3-round-large'>
 				</div>
@@ -58,10 +63,17 @@ session_start();
 		</nav>
 
 
-		<section id="rates" class="col-md-offset-2 col-xs-8"  >
+		<section id="rates" class="col-xs-offset-2 col-xs-8"  >
 		<?php
 				function checkIfUSD($array, $position){
 						if($array[$position] == 'S' && $array[$position+1] == 'D' && $array[$position+3] != 'E'){
+							return true;
+						}else{
+							return false;
+						}	
+				}
+				function checkIfEUR($array, $position){
+						if($array[$position] == 'U' && $array[$position+1] == 'R' && $array[$position+3] != 'U'){
 							return true;
 						}else{
 							return false;
@@ -80,52 +92,109 @@ session_start();
 					return $stringToReturn;
 				}
 
+				function display_content(){
+					$trigger=false;
+					for($currentPosition = 0; $currentPosition < sizeof($coursesArray) ; $currentPosition++){
+						if($datesArray[$currentPosition] == $_GET['date_2']){
+							$trigger = true;
+						}else if($datesArray[$currentPosition] == $_GET['date_1']){
+							$trigger = false;
+						}
+						if($trigger == true){
+							echo '<tr>';
+							echo "<td style='font-size : 20px;' >" . $datesArray[$currentPosition] . "</td><td style='font-size : 20px;'>" . $coursesArray[$currentPosition] . "</td><td style='font-size:20px;' >" . $coursesArrayEUR[$currentPosition] . '</td>';
+							echo '</tr>';
+						}
+					}							
+				}
 
- 
-				if($_GET['formDoor'][0] == 'USD-EUR'){
-					#откуда парсим
-					$content=file_get_contents('http://www.exchangerates.org.uk/USD-EUR-exchange-rate-history-full.html');
+					//				1 EUR -> USD
+					$contentEUR=file_get_contents('http://www.exchangerates.org.uk/EUR-USD-exchange-rate-history-full.html');
 					#начало забираемого контента: 
-					$pos=strpos($content,'<table'); 
+					$pos=strpos($contentEUR,'<table'); 
 					#Отрезаем все, что идет до нужной нам позиции: 
-					$content=substr($content,$pos); 
+					$contentEUR=substr($contentEUR,$pos); 
 					#Таким же образом находим позицию конечной строки: 
-					$pos=strpos($content, '</table>'); 
+					$pos=strpos($contentEUR, '</table>'); 
 					#Отрезаем ненужное: 
-					$content=substr($content,0,$pos); 
-					$content=substr($content,295);
-					$sizeOfContent = sizeof($content);
-					$content = substr($content,28);
+					$contentEUR=substr($contentEUR,0,$pos); 
+					$contentEUR=substr($contentEUR,295);
+					$sizeOfContent = sizeof($contentEUR);
+					$contentEUR = substr($contentEUR,28);
+					$coursesArrayEUR = array();
+					$datesArrayEUR = array();
+
+
+					for($var=0 ; $var < strlen($contentEUR) ; $var++){
+						//checking if we are at appropriate position 
+						if(checkIfEUR($contentEUR, $var) ){
+							//tmp1 and tmp2 variables will be used to store date and course of current date
+							if($contentEUR[$var+98-1] == '1'){
+								$tmp1 .='1';
+							}else if($contentEUR[$var+98-1] == '2'){
+								$tmp1 .='2';
+							}
+							for($x=0; $x<11;$x++){
+								if($contentEUR[$var+98+$x] == '/' && $x >= 10){
+									break;
+								}
+								if($contentEUR[$var+98+$x] != '<'  ){
+									$tmp1 .= $contentEUR[$var+98+$x];
+								}
+							}
+							for($z=0; $z<6;$z++){
+								//do not display spaces
+								if($contentUSD[$var+5+$z] != ' '){
+									$tmp2 .= $contentEUR[$var+5+$z];
+								}
+							}
+							$numberOfCourses++;
+							array_push($coursesArrayEUR, $tmp2);
+							array_push($datesArrayEUR , $tmp1);
+						}
+						unset($tmp1);
+						unset($tmp2);
+					}
+
+										//				1 USD -> EUR
+					$contentUSD=file_get_contents('http://www.exchangerates.org.uk/USD-EUR-exchange-rate-history-full.html');
+					#начало забираемого контента: 
+					$pos=strpos($contentUSD,'<table'); 
+					#Отрезаем все, что идет до нужной нам позиции: 
+					$contentUSD=substr($contentUSD,$pos); 
+					#Таким же образом находим позицию конечной строки: 
+					$pos=strpos($contentUSD, '</table>'); 
+					#Отрезаем ненужное: 
+					$contentUSD=substr($contentUSD,0,$pos); 
+					$contentUSD=substr($contentUSD,295);
+					$sizeOfContent = sizeof($contentUSD);
+					$contentUSD = substr($contentUSD,28);
 					$coursesArray = array();
 					$datesArray = array();
 					//count current number of courses available
 					$numberOfCourses = 0;
 
-
-
-					
-					for($var=0 ; $var<521552 ; $var++){
+					for($var=0 ; $var < strlen($contentUSD) ; $var++){
 						//checking if we are at appropriate position 
-						if(checkIfUSD($content, $var) ){
+						if(checkIfUSD($contentUSD, $var) ){
 							//tmp1 and tmp2 variables will be used to store date and course of current date
-							if($content[$var+98-1] == '1'){
+							if($contentUSD[$var+98-1] == '1'){
 								$tmp1 .='1';
-							}else if($content[$var+98-1] == '2'){
+							}else if($contentUSD[$var+98-1] == '2'){
 								$tmp1 .='2';
 							}
 							for($x=0; $x<11;$x++){
-								if($content[$var+98+$x] == '/' && $x >= 10){
+								if($contentUSD[$var+98+$x] == '/' && $x >= 10){
 									break;
 								}
-								if($content[$var+98+$x] != '<'  ){
-									//echo $content[$var+98+$x];
-									$tmp1 .= $content[$var+98+$x];
+								if($contentUSD[$var+98+$x] != '<'  ){
+									$tmp1 .= $contentUSD[$var+98+$x];
 								}
 							}
 							for($z=0; $z<6;$z++){
 								//do not display spaces
-								if($content[$var+5+$z] != ' '){
-									$tmp2 .= $content[$var+5+$z];
+								if($contentUSD[$var+5+$z] != ' '){
+									$tmp2 .= $contentUSD[$var+5+$z];
 								}
 							}
 							$numberOfCourses++;
@@ -136,33 +205,75 @@ session_start();
 						unset($tmp2);
 					}
 
+
 					$_GET['date_1'] = changeTypeOfDate($_GET['date_1']);
 					$_GET['date_2'] = changeTypeOfDate($_GET['date_2']);
-					//var_dump($_GET);
-					//2911 elements now!
-
+					//echo var_dump($_GET) . '</br>';
+					
+					for($x = 0; $x<2; $x++){
+						$date_1 .= $_GET['date_1'][$x];
+						$date_2 .= $_GET['date_2'][$x];
+					}
+					for($x = 0; $x<2; $x++){
+						$month_1 .= $_GET['date_1'][$x+3];
+						$month_2 .= $_GET['date_2'][$x+3];
+					}
+					for($x = 0; $x<4; $x++){
+						$year_1 .= $_GET['date_1'][$x+6];
+						$year_2 .= $_GET['date_2'][$x+6];
+					}
 					echo "<table class='col-xs-offset-3 col-xs-6'>";
-					echo "<caption style='text-align : center;'>USD-EUR course table</caption>";
-					echo "<tr><th>Date</th><th>Currency</th></tr>";
+					echo "<caption style='text-align : center;'>EUR-USD currency course table</caption>";
+					echo "<tr><th>Date</th><th>1 USD-EUR</th><th>1 EUR-USD</th></tr>";
+					//var_dump((int)$date_2,(int)$month_2,(int)$year_2);
 
-					$trigger=false;
-					for($currentPosition = 0; $currentPosition < sizeof($coursesArray) ; $currentPosition++){
-						if($datesArray[$currentPosition] == $_GET['date_2']){
-							$trigger = true;
-						}else if($datesArray[$currentPosition] == $_GET['date_1']){
-							$trigger = false;
+					if((int)$year_1 < (int)$year_2 ){
+						$trigger=false;
+						for($currentPosition = 0; $currentPosition < sizeof($coursesArray) ; $currentPosition++){
+							if($datesArray[$currentPosition] == $_GET['date_2']){
+								$trigger = true;
+							}else if($datesArray[$currentPosition] == $_GET['date_1']){
+								$trigger = false;
+							}
+							if($trigger == true){
+								echo '<tr>';
+								echo "<td style='font-size : 20px;' >" . $datesArray[$currentPosition] . "</td><td style='font-size : 20px;'>" . $coursesArray[$currentPosition] . "</td><td style='font-size:20px;' >" . $coursesArrayEUR[$currentPosition] . '</td>';
+								echo '</tr>';
+							}
 						}
-						if($trigger == true){
-							echo '<tr>';
-							echo "<td style='font-size : 20px;' >" . $datesArray[$currentPosition] . "</td><td style='font-size : 20px;'>" . $coursesArray[$currentPosition] . '</td>';
-							echo '</tr>';
+					}else if((int)$year_1 == (int)$year_2 && (int)$month_1 < (int)$month_2){
+						$trigger=false;
+						for($currentPosition = 0; $currentPosition < sizeof($coursesArray) ; $currentPosition++){
+							if($datesArray[$currentPosition] == $_GET['date_2']){
+								$trigger = true;
+							}else if($datesArray[$currentPosition] == $_GET['date_1']){
+								$trigger = false;
+							}
+							if($trigger == true){
+								echo '<tr>';
+								echo "<td style='font-size : 20px;' >" . $datesArray[$currentPosition] . "</td><td style='font-size : 20px;'>" . $coursesArray[$currentPosition] . "</td><td style='font-size:20px;' >" . $coursesArrayEUR[$currentPosition] . '</td>';
+								echo '</tr>';
+							}
 						}
+					}else if((int)$year_1 == (int)$year_2 && (int)$month_1 == (int)$month_2 && (int)$date_1 < (int)$date_2 ){
+						$trigger=false;
+						for($currentPosition = 0; $currentPosition < sizeof($coursesArray) ; $currentPosition++){
+							if($datesArray[$currentPosition] == $_GET['date_2']){
+								$trigger = true;
+							}else if($datesArray[$currentPosition] == $_GET['date_1']){
+								$trigger = false;
+							}
+							if($trigger == true){
+								echo '<tr>';
+								echo "<td style='font-size : 20px;' >" . $datesArray[$currentPosition] . "</td><td style='font-size : 20px;'>" . $coursesArray[$currentPosition] . "</td><td style='font-size:20px;' >" . $coursesArrayEUR[$currentPosition] . '</td>';
+								echo '</tr>';
+							}
+						}
+
+					}else{
+						echo "<div id='error'><p>First date should be less than second!</p></div>";
 					}
 					echo '</table>';
-				}elseif ($_GET['formDoor'][0] == 'EUR-USD') {
-					//if we want to add oportunity to change currency, here we have to change our SOURCE link and code a little bit
-				}
-		
 		?>
 
 		</section>

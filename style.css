@@ -153,6 +153,16 @@ td{
 	font-weight: bold;
 }
 
+#error{
+	font-size : 30px;
+	color : red;
+	text-align : center;
+}
+
+#display_inline{
+	display : inline-block;
+}
+
 
 footer{
 	min-width : 100%;
