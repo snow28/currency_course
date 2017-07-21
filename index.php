@@ -19,6 +19,7 @@ session_start();
 	    					<!--Fonts-->
 	<link href="https://fonts.googleapis.com/css?family=Fresca" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Crete+Round" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
     	    					<!--JQuery-->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     	    					<!--JQuery UI-->
@@ -55,7 +56,7 @@ session_start();
 					</div>
 				</div>
 				<div class='button'>
-					<input type="submit" value="Submit" class='w3-btn w3-white w3-border w3-border-red w3-round-large'>
+					<input style='border : 1px solid black;' type="submit" value="Submit" class='w3-btn w3-white w3-border  w3-round-large'>
 				</div>
 			</form>		
 		</nav>
@@ -63,6 +64,11 @@ session_start();
 
 		<section id="rates" class="col-xs-offset-2 col-xs-8"  >
 		<?php
+				function display_table_header($th1,$th2, $TH){
+					echo "<table class='col-xs-offset-3 col-xs-6'>";
+					echo "<caption style='text-align : center;'>" . $TH . " currency course table</caption>";
+					echo "<tr><th>Date</th><th>" . $th1 . "</th><th>" . $th2 . "</th></tr>";
+				}
 				function check_position($array, $position , $pre_last_letter, $last_letter , $first_of_next_currency){
 					if($array[$position] == $pre_last_letter && $array[$position+1] == $last_letter && $array[$position+3] != $first_of_next_currency){
 						return true;
@@ -83,17 +89,17 @@ session_start();
 					return $stringToReturn;
 				}
 
-				function display_content($coursesArray, $datesArray , $coursesArrayEUR){
+				function display_content($coursesArraySecond, $datesArraySecond , $courseArrayFirst){
 					$trigger=false;
-					for($currentPosition = 0; $currentPosition < sizeof($coursesArray) ; $currentPosition++){
-						if($datesArray[$currentPosition] == $_GET['date_2']){
+					for($currentPosition = 0; $currentPosition < sizeof($coursesArraySecond) ; $currentPosition++){
+						if($datesArraySecond[$currentPosition] == $_GET['date_2']){
 							$trigger = true;
-						}else if($datesArray[$currentPosition] == $_GET['date_1']){
+						}else if($datesArraySecond[$currentPosition] == $_GET['date_1']){
 							$trigger = false;
 						}
 						if($trigger == true){
 							echo '<tr>';
-							echo "<td style='font-size : 20px;' >" . $datesArray[$currentPosition] . "</td><td style='font-size : 20px;'>" . $coursesArray[$currentPosition] . "</td><td style='font-size:20px;' >" . $coursesArrayEUR[$currentPosition] . '</td>';
+							echo "<td style='font-size : 20px;' >" . $datesArraySecond[$currentPosition] . "</td><td style='font-size : 20px;'>" . $coursesArraySecond[$currentPosition] . "</td><td style='font-size:20px;' >" . $courseArrayFirst[$currentPosition] . '</td>';
 							echo '</tr>';
 						}
 					}							
@@ -129,8 +135,8 @@ session_start();
 					$firstContent=substr($firstContent,295);
 					$sizeOfContent = sizeof($firstContent);
 					$firstContent = substr($firstContent,28);
-					$coursesArrayEUR = array();
-					$datesArrayEUR = array();
+					$courseArrayFirst = array();
+					$datesArraySecondFirst = array();
 
 
 					for($var=0 ; $var < strlen($firstContent) ; $var++){
@@ -151,8 +157,8 @@ session_start();
 								}
 							}
 							$numberOfCourses++;
-							array_push($coursesArrayEUR, $tmp2);
-							array_push($datesArrayEUR , $tmp1);
+							array_push($courseArrayFirst, $tmp2);
+							array_push($datesArraySecondFirst , $tmp1);
 						}
 						unset($tmp1);
 						unset($tmp2);
@@ -173,8 +179,8 @@ session_start();
 					$secondContent=substr($secondContent,295);
 					$sizeOfContent = sizeof($secondContent);
 					$secondContent = substr($secondContent,28);
-					$coursesArray = array();
-					$datesArray = array();
+					$coursesArraySecond = array();
+					$datesArraySecond = array();
 					//count current number of courses available
 					$numberOfCourses = 0;
 
@@ -204,8 +210,8 @@ session_start();
 								}
 							}
 							$numberOfCourses++;
-							array_push($coursesArray, $tmp2);
-							array_push($datesArray , $tmp1);
+							array_push($coursesArraySecond, $tmp2);
+							array_push($datesArraySecond , $tmp1);
 						}
 						unset($tmp1);
 						unset($tmp2);
@@ -228,25 +234,31 @@ session_start();
 						$year_1 .= $_GET['date_1'][$x+6];
 						$year_2 .= $_GET['date_2'][$x+6];
 					}
-					echo "<table class='col-xs-offset-3 col-xs-6'>";
-					echo "<caption style='text-align : center;'>" . $_GET['formDoor'][0] . " currency course table</caption>";
-					echo "<tr><th>Date</th><th>" . $th1 . "</th><th>" . $th2 . "</th></tr>";
-					//var_dump((int)$date_2,(int)$month_2,(int)$year_2);
 
-					if((int)$year_1 < (int)$year_2 ){
-						
-						display_content($coursesArray, $datesArray , $coursesArrayEUR);
 
-					}else if((int)$year_1 == (int)$year_2 && (int)$month_1 < (int)$month_2){
+					$year_1 = (int)$year_1;
+					$year_2 = (int)$year_2;
+					$month_1 = (int)$month_1;
+					$month_2 = (int)$month_2;
+					$day_1 = (int)$day_1;
+					$day_2 = (int)$day_2;
 
-						display_content($coursesArray, $datesArray , $coursesArrayEUR);
+					if($year_1 < $year_2 ){
+						display_table_header($th1, $th2 , $_GET['formDoor'][0]);
+						display_content($coursesArraySecond, $datesArraySecond , $courseArrayFirst);
 
-					}else if((int)$year_1 == (int)$year_2 && (int)$month_1 == (int)$month_2 && (int)$date_1 < (int)$date_2 ){
+					}else if($year_1 == $year_2 && $month_1 < $month_2){
+						display_table_header($th1, $th2 ,$_GET['formDoor'][0]);
+						display_content($coursesArraySecond, $datesArraySecond , $courseArrayFirst);
 
-						display_content($coursesArray, $datesArray , $coursesArrayEUR);
+					}else if($year_1 == $year_2 && $month_1 == $month_2 && $date_1 < $date_2 ){
+						display_table_header($th1, $th2 ,$_GET['formDoor'][0]);
+						display_content($coursesArraySecond, $datesArraySecond , $courseArrayFirst);
 
 					}else{
+						
 						echo "<div id='error'><p>First date should be less than second!</p></div>";
+						
 					}
 					echo '</table>';
 		?>
